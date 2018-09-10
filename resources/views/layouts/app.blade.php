@@ -15,9 +15,9 @@
 </head>
 <body>
     <div id="app">
-        @include('layouts.navbar')
-        <div class="container">
-            @include('layouts.messages')
+        @include('layouts.navbar')    
+        <div class="container">   
+            @include('include/messages')
             @yield('content')
         </div>
     </div>

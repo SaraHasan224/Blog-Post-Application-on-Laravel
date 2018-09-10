@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Post;
+use DB;
+
 class PostsController extends Controller
 {
        /**
@@ -57,8 +60,7 @@ class PostsController extends Controller
             'description' => 'required',
             'cover_image' => 'image|nullable|max:1999'
     ]);
-
-    //HAndle File Uplaod
+    //Handle File Uplaod
     if($request->hasFile('cover_image'))
     {
         //Get filename with extension
@@ -70,7 +72,7 @@ class PostsController extends Controller
         //File Name to store
         $filenameToStore = $filename.'_'.time().'.'.$extension;
         //Upload Image
-        $filenameToStore = 'noimage.jpg';
+        $path = $request->file('cover_image')->storeAs('public/cover_images',$filenameToStore);
     }
     else
     {
@@ -97,7 +99,7 @@ class PostsController extends Controller
     {
 //        return Post::find($id);
         $post = Post::find($id);
-        return view('posts.show')->with('post',$post);
+        return view('posts.show')->with('posts',$post);
     }
 
     /**
@@ -152,6 +154,12 @@ class PostsController extends Controller
         if(auth()->user()->id !== $post->user_id)
         {
             return redirect('/posts') -> with('error','Unauthorized Page');
+        }
+        if($post -> cover_images != 'noimage.jpg')
+        {
+            //Delete image
+            Storage::delete('public/cover_images/'.$post->cover_image);
+
         }
         $post -> delete();
         return redirect('/posts')->with('success','Post Removed');
